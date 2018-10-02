@@ -1,0 +1,82 @@
+<? 
+include"session.php"; // session.php 파일을 포함
+?>
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Joohong's DB - Web Version</title>
+    <link rel="stylesheet" href="./joohongstylesheet.css?ver=1">
+    <?php
+    $myIP = '192.168.1.25';
+    $check_logined = 0;
+     ?>
+  </head>
+
+  <body>
+  <div id="joohong-container">
+      <div id="joohong-header">
+        <h1> WELCOME </h1>
+      </div>
+
+      <div id="joohong-login">
+        <?php
+          $host = 'localhost';
+          $user = 'root';
+          $pw = 'a123123123';
+          $dbName = 'joohongdb';
+          $mysqli = new mysqli($host, $user, $pw, $dbName); // mysql 로 접근하도록 설정
+
+          $memberID = $_POST['id'];
+          $memberPW = $_POST['pw'];
+
+          $sql = "select * from member where userID='$memberID' and userPW='$memberPW';";
+          $res = $mysqli->query($sql); // 실행 결과를 $res에 저장
+          //echo '$res'; // 어떻게 나오는지 출력해보자.
+
+          $row = $res->fetch_array(MYSQLI_ASSOC); // 넘어온 결과를 한 행씩 패치해서 $row라는 배열에 저장
+
+          if($row != null){   // 배열이 존재한다면
+            $_SESSION['ses_username']=$row['userNAME']; // 세션을 만들어준다.
+            echo $_SESSION['ses_username'].'님 안녕하세요<br><br><br>';
+            echo '<a href="./Intro.php">[로그아웃 하기]</a>';
+            $check_logined = 1;
+          }
+          if($row == null){
+            echo '회원 정보가 없습니다.<br><br><br>';
+            echo '<input type="button" value="뒤로 가기" onclick="location.href=\'http://'.$myIP.'/JOOHONG/Intro.php\'">';
+            $check_logined = 2;
+          }
+
+       ?>
+      </div>
+      <?php
+        if($check_logined == 1){
+          //echo "<script>
+          //  alert(\"데이터를 받는 중 입니다.\");
+          //  window.open('./dr2.html','drdr','width=600,height=600,top=100,left=100');
+          //  </script>";
+
+          echo '<div id="joohong-loginbody">';
+          echo '<h1>'.$_SESSION['ses_username'].' 님의 데이터 정보입니다.<h1>';
+          echo '</div>';
+
+
+
+    }
+
+    else if($check_logined == 2){
+        echo '<div id="joohong-loginbody">';
+        echo '<h1>로그인에 실패했습니다.</h1>';
+        echo '<input type="button" value="뒤로 가기" onclick="location.href=\'http://'.$myIP.'/JOOHONG/Intro.php\'">';
+        echo '</div>';
+    }
+    ?>
+
+
+
+
+    </div>
+
+</html>

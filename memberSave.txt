@@ -1,0 +1,43 @@
+<?php
+include ("./myIP.php");
+?>
+<!doctype html>
+<html>
+  <meta charset="utf-8">
+<?php
+
+$host = 'localhost';
+$user = 'root';
+$pw = 'a123123123';
+$dbName = 'joohongdb';
+$mysqli = new mysqli($host, $user, $pw, $dbName);
+
+  $userid = $_POST['id'];
+  $userpw = $_POST['pwd'];
+  $username = $_POST['name'];
+  $userage = $_POST['age'];
+  $usersex = $_POST['sex'];
+
+  $sql = "insert into member(userID, userPW, userName, userAGE, userSEX)";
+  $sql = $sql.' values("'.$userid.'","'.$userpw.'","'.$username.'","'.$userage.'","'.$usersex.'");';
+  if($mysqli->query($sql)){ // 쿼리문이 잘 들어갔다면
+    $makingUserTable = "create table ".$userid." (date DATE NOT NULL, time TIME NOT NULL, microtime FLOAT NOT NULL, data1 INT NOT NULL, data2 INT NOT NULL, data3 INT NOT NULL);";
+    if($mysqli->query($makingUserTable)){
+      ;
+    }
+      else{
+        echo 'TABLE 생성 실패 -> 관리자에게 문의하세요 <br>';
+      };
+    echo '회원 가입에 성공하였습니다. <br>';
+    echo $username.'님 가입을 축하드립니다 <br>';
+  }else{
+    echo '회원 가입에 실패하였습니다.<br>';
+  }
+  mysqli_close($mysqli);  // mysqli 종료
+
+?>
+<?php
+echo '<input type = "button" value="메인화면으로" onclick="location.href=\'http://'.$myIP.'/JOOHONG/Intro.php\'">';
+echo '<input type = "button" value="이전화면으로" onclick="location.href=\'http://'.$myIP.'/JOOHONG/Join.php\'">';
+?>
+</html>

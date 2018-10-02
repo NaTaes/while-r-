@@ -1,0 +1,100 @@
+<?php
+include ("./myIP.php");
+?>
+<!doctype html>
+<html>
+  <meta charset="utf-8">
+<?php
+$host = 'localhost';
+$user = 'root';
+$pw = 'a123123123';
+$dbName = 'joohongdb';
+$mysqli = new mysqli($host, $user, $pw, $dbName);
+
+
+  $myname = $_POST['inputname'];
+  $myport = $_POST['inputport'];
+  $myid = $_POST['inputid'];
+  error_reporting(0);
+
+  echo '<div id="joohong-loginbody">';
+  set_time_limit(0);
+  $sSock = socket_create(AF_INET, SOCK_STREAM, 0);
+  //socket_bind($sSock, $myIP, $myport) or die('주소 지정 실패 (새로운 포트 필요)');
+  if(socket_bind($sSock, $myIP, $myport)){
+    // [★★★★★★★★★★★태승이형이랑 확인해볼 부분★★★★★★★★★★★★★★★★★★★★★]
+    echo '<strong>User : '.$myname.'</strong><br><br>';
+    $starttime = date('Y-m-d H:i:s:');
+    $startmicrotime = (explode(" ", microtime()));
+    //echo (
+    $startmicrotime[0]=(int)($startmicrotime[0]*10000);
+
+    echo 'START : '.$starttime.$startmicrotime[0].'<br><br>';
+
+    // 종료시간이 큰 문제다!!!
+
+  }
+  else {
+    echo '주소 지정 실패 (새로운 포트 필요)   ';
+    echo '<input type="button" value="창닫기" onclick=window.close()>';
+    die();
+  }
+  socket_listen($sSock);
+
+  $cSock = socket_accept($sSock);
+
+  socket_getpeername($cSock, $addr, $port);
+  echo '접속 IP : '.$addr.'   <br>접속 Port : '.$port.'<br>';
+  echo '<table border="1">';
+  echo '<tr><td align="center">시간</td><td align="center">Data1</td><td align="center">Data2</td><td align="center">Data3</td></tr>';
+  while(1){
+
+    $var = socket_read($cSock, 50, 2);
+
+if($var == FALSE){
+  socket_close($cSock);
+  break;
+}
+//unpack("i*",$var);
+//echo '전송된 데이터 타입: '.gettype($var).'<br>';
+//echo '전송된 데이턱 길이: '.strlen($var).'<br>';
+//echo '전송된 데이터 내용: '.$var.'<br>';
+//echo 'unpack 함수 적용:'.unpack("I*",$var).'<br>';
+//echo 'settype 함수 적용: '.settype($var, "integer").'<br>';
+//echo 'ord 함수 적용:'.ord($var).'<br>';
+//echo 'mb함수 적용'.mb_convert_encoding('&#'.$var.';','UTF-8','HTML-ENTITIES').'<br>';
+//echo 'intvar함수 적용 : '.intval($var).'<br>';
+
+$LIST = explode(' ', $var);
+echo '<tr><td align="left">'.($TIME=date('Y-m-d H:i:s'));
+$inputtime = (explode(" ", $TIME));
+$microsec = (explode(" ", microtime()));
+echo '.'.($microsec[0]=(int)($microsec[0]*10000)).'</td>';
+$inputmicro = '0.'.$microsec[0];
+echo '<td align="center">'.$LIST[0].'</td>';
+echo '<td align="center">'.$LIST[1].'</td>';
+echo '<td align="center">'.$LIST[2].'</td></tr>';
+
+// MYSQL
+$sql = "insert into ";
+$sql = $sql.$myid;
+$sql = $sql."(date, time, microtime, data1, data2 ,data3) ";
+$sql = $sql.' values("'.$inputtime[0].'","'.$inputtime[1].'","'.$inputmicro.'","'.$LIST[0].'","'.$LIST[1].'","'.$LIST[2].'");';
+//echo $sql;
+if($mysqli->query($sql)){ // 쿼리문이 잘 들어갔다면
+
+  }
+else{
+    echo 'data input failed<br>';
+  }
+}
+echo '</tr></table>';
+//  $num ++;
+//
+//}
+//while($cSock = socket_accept($sSock));
+//socket_write($cSock, "aaa");
+mysqli_close($mysqli);
+socket_close($sSock);
+?>
+</html>

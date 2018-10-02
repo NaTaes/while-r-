@@ -1,0 +1,46 @@
+<?php
+include ("./myIP.php");
+?>
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title> 회원 가입 </title>
+  <?php
+   ?>
+</head>
+
+<body>
+  <form name="join" method="post" action="memberSave.php">
+    <h1>회원 가입</h1>
+    <table border = "1">
+      <tr>
+        <td>ID</td>
+        <td><input type="text" size="30" name="id"></td>
+      </tr>
+      <tr>
+        <td>PW</td>
+        <td><input type="password" size="30" name="pwd"></td>
+      </tr>
+      <tr>
+        <td>이름</td>
+        <td><input type="text" size="30" maxlength="10" name="name"></td>
+      </tr>
+      <tr>
+        <td>나이</td>
+        <td><input type="number" name="age" min="1" max="99"> (1~99)</td>
+      </tr>
+      <tr>
+        <td>성별</td>
+        <td>
+          <input type="radio" name="sex" value="man" checked="checked">남자
+          <input type="radio" name="sex" value="woman">여자
+        </td>
+      </tr>
+    </table>
+    <input type="submit" value="submit"> <input type=reset value="rewrite">
+    <?php
+    echo '<input type = "button" name="버튼" value="back" onclick="location.href=\'http://'.$myIP.'/JOOHONG/Intro.php\'">';
+    ?>
+  </form>

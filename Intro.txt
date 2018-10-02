@@ -1,0 +1,116 @@
+<!doctype html>
+<?php
+include ("./session.php"); // session.php 파일을 포함
+include ("./myIP.php");
+?>
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <title> Joohong's DB - Web Version </title>
+    <link rel="stylesheet"  href="./joohongstylesheet.css?ver=1">
+    <?php
+
+    error_reporting(0);
+    ?>
+    <script>
+    function myLOGOUT(){
+      window.location.href="./logout.php";
+      <?php
+
+      ?>
+    };
+    </script>
+    <script>
+      function nwindow(){
+        var url="./inputdata.php";
+        window.location.href="./DOING_TEMP.php";
+        var openWindow = window.open(url,"INPUT DATA","width=400,height=200,left=600");
+        if(openwindow == null || openwindow.closed){
+          window.location.href="./login.php";
+        }
+      };
+
+    </script>
+  </head>
+
+<body>
+  <div id="joohong-container">
+    <div id="joohong-header">
+      <h1> 주홍이의 DB 관리 </h1>
+    </div>
+
+    <div id="joohong-login">
+      <?php
+        if(!$_SESSION['ses_username']){
+
+          echo '<form method="post" action="login.php">';
+          /*
+          post방식과 get방식에 있어서 가장 큰 차이점은,
+          post방식으로 입력받게 되면, url(주소창)에 입력받은 값에 대한 정보가 뜨지 않습니다.
+          반대로, get방식으로 입력받게 되면, url(주소창)에 그대로 입력받은 값들이 뜨게 됩니다.
+          따라서, 로그인을 만들때에는, get보단, post방식이 좋습니다.
+
+          더 자세히 비교하자면,
+          Post
+          - Form 태그에서 action을 통해 데이터를 전송
+          - post 방식은 파일의 형태로 전송됨으로 url상에 나타나지 않아 보안성이 있음
+          - id나 password같은 중요한 정보를 전송할 때 사용
+          - url상에 나타나지 않기 때문에 get방식에 비해 대용량의 데이터를 전송할 수 있음
+
+          Get
+
+          - post와 같이 Form태그를 사용해서 전송하거나 주소창에 직접 입력해도 전송이 가능
+          - 하지만 Form 태그에서의 get방식은 서버로 전송 시 서버의 처리가 지연될 경우,
+            중복해서 요청이 이루어지는 문제가 있음으로 사용하지 않음
+          - get방식은 전송 할 데이터를 문자열 형태로 url뒤에 인수로 붙여서 전송하므로
+            누구나 전송 내용을 볼 수 있기때문에 보안성이 없음
+          - url뒤에 문자열 형태로 첨부되기 때문에 길이가 제한됨 : 전송 할 데이터의 용량이 작은 경우에 사용
+          */
+          echo 'ID : <input type = "text" name = "id"><br>';
+          echo 'PW : <input type = "password" name ="pw"><br>';
+
+          echo '<input class="button" type = "submit" value="login">';
+          echo '<input class="button" type = "button" name="버튼" value="sign up" onclick="location.href=\'http://'.$myIP.'/JOOHONG/join.php\'">';
+
+          echo '</form>';
+
+        }
+        else{
+          echo $_SESSION['ses_username'].'님 안녕하세요<br><br><br>';
+          $check_logined = 1;
+          $logout = 1;
+          echo'<input type="button" value="로그아웃" onclick="javascript:myLOGOUT()">';
+
+        }
+     ?>
+     </div>
+<?php
+
+  if(!$_SESSION['ses_username']){
+    echo '<div id="joohong-body">
+      <h2> Welcome~~!! </h2>
+      <h4> 로그인을 해주세요. </h4>
+    </div>';
+  }
+  else{
+
+    $link = 'http://'.$myIP.'/JOOHONG/inputdata.php';
+
+    echo '<div id="joohong-loginbody">';
+    echo '<h1>'.$_SESSION['ses_username'].' 님의 데이터 정보입니다.<h1>';?>
+    <input type="button" value="새로 받기" style="font-size:20pt; WIDTH:200px; HEIGHT:80px" onclick = "javascript:nwindow()">
+    <?php
+    echo '   <input type="button" value="정보 확인" style="font-size:20pt; WIDTH:200px; HEIGHT:80px"
+                    onclick = "location.href=\'http://'.$myIP.'/JOOHONG/showdata.php\'">';
+
+    echo '</div>';
+  }
+ ?>
+
+
+
+
+
+  </div>
+</body>
+</html>

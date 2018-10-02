@@ -1,0 +1,24 @@
+<
+<?php
+//include ("./session.php"); // session.php 파일을 포함
+//include ("./myIP.php");
+?>
+
+<!doctype html>
+<html>
+<?php
+  //$name = $_POST['inputname'];
+  //$port = $_POST['inputport'];
+  //echo '<strong>DATA 전송중(자동으로 창 닫힘)</strong></br>';
+  //echo '<form name="hiddenform" id="inputform" method="post" action="checkTCP.php" target="_blank">';
+  //echo '<h3>'.$name.'님의 데이터를 입력받습니다.</h3>';
+  //echo '<input type="hidden" name="inputname" value="'.$name.'">';
+  //echo '<input type="hidden" name="inputport" value="'.$port.'">';
+  //echo '</form>';
+  //echo '<script>
+  //document.hiddenform.submit();
+  //</script>';
+  ////echo $_SESSION['ses_username'];   // 김주홍 잘 출력
+ ?>
+
+</html>

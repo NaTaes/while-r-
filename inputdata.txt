@@ -1,0 +1,48 @@
+<?php
+include ("./session.php"); // session.php 파일을 포함
+include ("./myIP.php");
+?>
+
+<!doctype html>
+
+<html>
+  <head>
+    <script>
+    window.focus();
+    </script>
+
+    <script>
+    function closePopup(){
+      window.opener.location = "./login.php";
+      window.close();
+    }
+    </script>
+    <script>
+    function ButtonClicked(){
+      btn = document.getElementById('btn');
+      //btn.disabled='disabled';
+      document.getElementById('inputform').submit();
+    }
+    </script>
+  </head>
+
+  <body onunload="javascript:closePopup()">
+
+    <div id="joohong-container">
+      <?php
+        $inputPort = 3000;
+        echo '<form id="inputform" method="post" action="checkTCP.php" target="_blank">';
+        echo '<h3>'.$_SESSION['ses_username'].'님의 데이터를 입력받습니다.</h3>';
+        echo '서버  IP  : '.$myIP.'<br>';
+        echo '연결 PORT : ';
+        echo '<input type="number" name="inputport" value="3500"> ';
+        echo '<input type="hidden" name="inputname" value="'.$_SESSION['ses_username'].'">';
+        echo '<input type="hidden" name="inputid" value="'.$_SESSION['ses_id'].'">';
+        echo '<input type="button" id="btn" value="연결" onclick="javascript:ButtonClicked()"> ';
+        echo '<input type="button" value="닫기" onclick=window.close()>';
+        echo '</form>';
+       ?>
+    </div>
+  </body>
+
+</html>
