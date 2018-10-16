@@ -1,4 +1,4 @@
-# while(r); 프로젝트 소스
+# while(r); Project Source code
 
 ### 1. whiler.c
 
