@@ -25,7 +25,7 @@
 //
 
 //define
-#define I2C_DEV  	"/dev/i2c-1"
+#define I2C_DEV		"/dev/i2c-1"
 #define SPI_DEV		"/dev/spidev0.0"
 #define CLOCK_FREQ 	25000000.0
 #define PCA_ADDR	0x40
