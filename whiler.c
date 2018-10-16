@@ -41,7 +41,7 @@
 #define GPIO_ADDRESS	0x7E200000
 #define GPIO_IO_PERI	0x7E000000
 #define BCM_IO_BASE	0x3F000000
-#define GPIO_BASE       BCM_IO_BASE + (GPIO_ADDRESS - GPIO_IO_PERI)
+#define GPIO_BASE	BCM_IO_BASE + (GPIO_ADDRESS - GPIO_IO_PERI)
 #define GPIO_SIZE	(1024 * 4)
 
 #define GPIO_IN(n)	(*(gpio+(n/10))&=~(7<<((n%10)*3)))
@@ -51,9 +51,9 @@
 #define GPIO_GET(n)	((*(gpio+13)&(1<<n))>>n)
 
 #define SPI_CS		8
-#define BLDC_ST		17
-#define BLDC_SP		27
-#define BLDC_CW		23
+#define BLDC_ST	17
+#define BLDC_SP	27
+#define BLDC_CW	23
 #define BLDC_CCW	22
 
 #define LOW             0
