@@ -1,4 +1,4 @@
-# while(r);
+# while(r); 프로젝트 소스
 
 ### 1. whiler.c
 
