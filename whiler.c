@@ -40,29 +40,29 @@
 
 #define GPIO_ADDRESS	0x7E200000
 #define GPIO_IO_PERI	0x7E000000
-#define BCM_IO_BASE		0x3F000000
+#define BCM_IO_BASE	0x3F000000
 #define GPIO_BASE       BCM_IO_BASE + (GPIO_ADDRESS - GPIO_IO_PERI)
-#define GPIO_SIZE		(1024 * 4)
+#define GPIO_SIZE	(1024 * 4)
 
-#define GPIO_IN(n)		(*(gpio+(n/10))&=~(7<<((n%10)*3)))
-#define GPIO_OUT(n)		(*(gpio+(n/10))|=(1<<((n%10)*3)))
-#define GPIO_SET(n)		(*(gpio+7)=(1<<n))
-#define GPIO_CLR(n)		(*(gpio+10)=(1<<n))                                                     
-#define GPIO_GET(n)		((*(gpio+13)&(1<<n))>>n)
+#define GPIO_IN(n)	(*(gpio+(n/10))&=~(7<<((n%10)*3)))
+#define GPIO_OUT(n)	(*(gpio+(n/10))|=(1<<((n%10)*3)))
+#define GPIO_SET(n)	(*(gpio+7)=(1<<n))
+#define GPIO_CLR(n)	(*(gpio+10)=(1<<n))                                                     
+#define GPIO_GET(n)	((*(gpio+13)&(1<<n))>>n)
 
-#define SPI_CS 8
-#define BLDC_ST 17
-#define BLDC_SP	27
-#define BLDC_CW	23
-#define BLDC_CCW 22
+#define SPI_CS		8
+#define BLDC_ST		17
+#define BLDC_SP		27
+#define BLDC_CW		23
+#define BLDC_CCW	22
 
 #define LOW             0
 #define HIGH            1
 
 #define SPI_SPEED   	3000000  // 1MHza
 
-#define SLEEP_SPEED		500000
-#define SET_SPEED		100000
+#define SLEEP_SPEED	500000
+#define SET_SPEED	100000
 //
 
 //global variable
@@ -101,8 +101,7 @@ int emg2_Ad_count;
 int emg1_Pw;
 int emg2_Pw;
 
-int emg1_pwm;
-int emg2_pwm;
+float emg_pwm;
 
 unsigned char buffer[3];
 char snd_buff[3];
@@ -186,8 +185,8 @@ int main(int argc, char *argv[])
 		sub1 = emg1v - emg1_Ad;
 		sub2 = emg2v - emg2_Ad;
 		//motor control
-		input_pwm = (sub1 < 0 ? 0 : sub1 > (emg1_Pw - emg1_Ad) ? (emg1_Pw - emg1_Ad) : sub1) * emg1_pwm;
-	  	input_pwm += (sub2 < 0 ? 0 : sub2 > (emg2_Pw - emg2_Ad) ? (emg2_Pw - emg2_Ad) : sub2) * emg2_pwm;
+		input_pwm = (int)((sub1 < 0 ? 0 : sub1 > (emg1_Pw - emg1_Ad) ? (emg1_Pw - emg1_Ad) : sub1) * emg_pwm);
+	  	input_pwm += (int)((sub2 < 0 ? 0 : sub2 > (emg2_Pw - emg2_Ad) ? (emg2_Pw - emg2_Ad) : sub2) * emg_pwm);
 		
 		printf("emg1v : %d emg1_Ad : %d emg2v : %d emg2_Ad : %d emg1_Pw : %d emg2_Pw : %d pwm = %d\n", emg1v, emg1_Ad, emg2v, emg2_Ad, emg1_Pw, emg2_Pw, input_pwm);
 
@@ -632,32 +631,16 @@ int Calculate_Percentage(void)
 {
 	int emg1_range, emg2_range;
 	int Total_emg;
-	int emg1_percent, emg2_percent;
 	
-	printf("emg1_Ad : %d(%d)\nemg2_Ad : %d(%d)\n", emg1_Ad, emg1_Ad_count, emg2_Ad, emg2_Ad_count);
-	sleep(2);
 	emg1_Ad = emg1_Ad / emg1_Ad_count;
 	emg2_Ad = emg2_Ad / emg2_Ad_count;
 
-	printf("Average emg1 : %d\nAverage emg2 : %d\n", emg1_Ad, emg2_Ad);
-	printf("emg1_Pw : %d\nemg2_Pw : %d\n", emg1_Pw, emg2_Pw);
-	sleep(2);
-
 	emg1_range = emg1_Pw - emg1_Ad;
 	emg2_range = emg2_Pw - emg2_Ad;
-
-	printf("emg1_range : %d\nemg2_range : %d\n", emg1_range, emg2_range);
 	
 	Total_emg = emg1_range + emg2_range;
-
-	emg1_percent = (float)emg1_range / Total_emg * 100;
-	emg2_percent = 100 - emg1_percent;
-
-	emg1_pwm = 4095 * emg1_percent / 100 / emg1_range;
-	emg2_pwm = 4095 * emg2_percent / 100 / emg2_range;
 	
-	printf("Total_emg : %d\nemg1_pwm : %d\nemg2_pwm : %d\n", Total_emg, emg1_pwm, emg2_pwm);
-	sleep(2);
-
+	emg_pwm = (float)4095 / Total_emg;
+	
 	return 0;
 }
