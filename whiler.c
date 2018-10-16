@@ -61,7 +61,7 @@
 
 #define SPI_SPEED   	3000000  // 1MHza
 
-#define SLEEP_SPEED	500000
+#define SLEEP_SPEED	40000
 #define SET_SPEED	100000
 //
 
@@ -590,10 +590,8 @@ int power_Adjustment(void)
 	GPIO_CLR(BLDC_SP);
 	GPIO_SET(BLDC_CW);
 
-	printf("st %d sp %d cw %d\n", GPIO_GET(BLDC_ST), GPIO_GET(BLDC_SP), GPIO_GET(BLDC_CW));
+	//printf("st %d sp %d cw %d\n", GPIO_GET(BLDC_ST), GPIO_GET(BLDC_SP), GPIO_GET(BLDC_CW));
 	while(angle < 57);
-	//while(1);
-	//sleep(3);
 
 	EMG_Check = 0;
 
@@ -610,9 +608,8 @@ int power_Adjustment(void)
 	GPIO_CLR(BLDC_CW);
 	GPIO_CLR(BLDC_SP);
 
-	printf("st %d sp %d cw %d ccw %d\n", GPIO_GET(BLDC_ST), GPIO_GET(BLDC_SP), GPIO_GET(BLDC_CW), GPIO_GET(BLDC_CCW));
+	//printf("st %d sp %d cw %d ccw %d\n", GPIO_GET(BLDC_ST), GPIO_GET(BLDC_SP), GPIO_GET(BLDC_CW), GPIO_GET(BLDC_CCW));
 	
-	//sleep(3);
 	while(angle > 32);
 
 	flex_Check = 0;
@@ -623,7 +620,6 @@ int power_Adjustment(void)
 	flex_Check = 1;
 
 	printf("Setting is End\n");
-	sleep(2);
 	return 0;
 }
 
