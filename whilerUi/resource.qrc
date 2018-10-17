@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/Letter-W-blue-icon.png</file>
+        <file>images/people2.png</file>
+        <file>images/Board.png</file>
+        <file>images/weekendPicture.JPG</file>
+        <file>images/progressPicture.JPG</file>
+        <file>images/logoutIcon.png</file>
+        <file>images/refreshIcon.png</file>
+        <file>images/refreshIcon2.png</file>
+        <file>images/logoutIcon2.png</file>
+    </qresource>
+</RCC>
