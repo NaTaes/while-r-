@@ -10,6 +10,8 @@ QT_CHARTS_END_NAMESPACE
 
 QT_CHARTS_USE_NAMESPACE
 
+class QTcpSocket;
+
 namespace Ui {
 class Widget;
 }
@@ -22,8 +24,6 @@ public:
     explicit Widget(QWidget *parent = 0);
     ~Widget();
 
-
-
 private:
     void createPieChart();
     void createBarChart();
@@ -32,12 +32,24 @@ private:
     QChartView *barChartView;
     QChartView *lineChartView;
     Ui::Widget *ui;
+    QTcpSocket *tcpSocket;
 
 private slots:
     void mouse_Pressed();
     void mouse_Enter();
     void mouse_Left();
     void refresh_Pressed();
+    void login_Pressed();
+    void logout_Pressed();
+    void joinLabel_Enter();
+    void joinLabel_Left();
+    void joinLabel_Pressed();
+
+    void connectToServer(const QString &host, quint16 port);
+    void receiveData();
+    void error();
+    void closeConnection();
+
 };
 
 #endif // WIDGET_H

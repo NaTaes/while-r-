@@ -9,5 +9,9 @@
         <file>images/refreshIcon.png</file>
         <file>images/refreshIcon2.png</file>
         <file>images/logoutIcon2.png</file>
+        <file>images/login_background.jpg</file>
+        <file>images/login_background_ver2.jpg</file>
+        <file>images/mail.png</file>
+        <file>images/password.png</file>
     </qresource>
 </RCC>

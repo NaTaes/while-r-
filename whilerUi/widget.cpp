@@ -14,6 +14,14 @@
 #include <QtCharts/QBarCategoryAxis>
 
 #include <QtCharts/QLineSeries>
+#include <QFont>
+
+#include <QTcpSocket>
+#include <QDesktopServices>
+#include <QUrl>
+
+#include <QString>
+#include <QStringList>
 
 #include "piechart.h"
 
@@ -26,11 +34,25 @@ Widget::Widget(QWidget *parent) :
     ui->setupUi(this);
     setWindowTitle("while(r);");
 
-    //ui->loginView->hide();
+    ui->graphView->hide();
+
+    ui->logoutButton->hide();
+
+    tcpSocket = new QTcpSocket(this);
 
     connect(ui->logoutIcon, SIGNAL(mouse_Pressed()), this, SLOT(mouse_Pressed()));
-    //connect(ui->logoutIcon, SIGNAL(mouse_Left()), this, SLOT(mouse_Left()));
-    //connect(ui->logoutIcon, SIGNAL(mouse_Enter()), this, SLOT(mouse_Enter()));
+    connect(ui->logoutIcon, SIGNAL(mouse_Left()), this, SLOT(mouse_Left()));
+    connect(ui->logoutIcon, SIGNAL(mouse_Enter()), this, SLOT(mouse_Enter()));
+    connect(ui->loginButton, SIGNAL(clicked(bool)), this, SLOT(login_Pressed()));
+    connect(ui->logoutButton, SIGNAL(clicked(bool)), this, SLOT(logout_Pressed()));
+
+    connect(ui->joinLabel, SIGNAL(mouse_Enter()), this, SLOT(joinLabel_Enter()));
+    connect(ui->joinLabel, SIGNAL(mouse_Left()), this, SLOT(joinLabel_Left()));
+    connect(ui->joinLabel, SIGNAL(mouse_Pressed()), this, SLOT(joinLabel_Pressed()));
+
+    connect(tcpSocket, SIGNAL(disconnected()), this, SLOT(closeConnection()));
+    connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(receiveData()));
+    connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error()));
 
     connect(ui->refreshIcon, SIGNAL(mouse_Pressed()), this, SLOT(refresh_Pressed()));
 
@@ -66,6 +88,114 @@ void Widget::mouse_Left()
 {
     //ui->loginView->hide();
     //ui->graphView->show();
+}
+
+void Widget::joinLabel_Enter()
+{
+    QFont f = font();
+    f.setUnderline(true);
+
+    ui->joinLabel->setFont(f);
+}
+
+void Widget::joinLabel_Left()
+{
+    QFont f = font();
+    f.setUnderline(false);
+
+    ui->joinLabel->setFont(f);
+}
+
+void Widget::joinLabel_Pressed()
+{
+    QString link = "http://172.30.1.56:8001";
+    QDesktopServices::openUrl(QUrl(link));
+}
+
+void Widget::login_Pressed()
+{
+    QString strtmp;
+    strtmp = ui->idEdit->text();
+    if(strtmp != "")
+    {
+        ui->loginView->hide();
+        ui->graphView->show();
+        ui->logoutButton->show();
+    }
+
+    QString addr = "172.30.1.56";
+    QString port_str = "8004";  //LineEdit
+
+    bool is_ok;
+    int port = port_str.toInt(&is_ok, 10);
+    if (!is_ok || port <= 0) return;
+
+    this->connectToServer(addr, port);
+
+    QString q_str = "1" + ui->idEdit->text() + " " + ui->pwEdit->text();
+
+    QByteArray utf8_str = q_str.toUtf8();
+
+    //qDebug("send: '%s'", utf8_str.constData());
+
+    tcpSocket->write(utf8_str);
+}
+
+void Widget::connectToServer(const QString &host, quint16 port)
+{
+   qDebug("conn: host=%s, port=%d", host.toUtf8().constData(), port);
+   tcpSocket->connectToHost(host, port);
+}
+
+void Widget::receiveData()
+{
+   qDebug("rcv: start");
+
+   QByteArray rcv_bytes = tcpSocket->readAll();
+
+   QString rcv_data;
+   if (rcv_bytes.length() == 0) rcv_data = "[no data]";
+   else rcv_data = QString::fromUtf8(rcv_bytes);
+
+   //ui->textEdit->setText(rcv_data);
+   //qDebug("rcv: '%s'", rcv_data.toUtf8().constData());
+
+   QString condition = rcv_data.section(";", 0, 0);
+   QString result = rcv_data.section(";", 1, 1);
+
+   if(condition == "whiler")
+   {
+       ui->loginView->hide();
+       ui->graphView->show();
+       ui->logoutButton->show();
+   }
+
+   qDebug("%s", result.toUtf8().constData());
+
+   tcpSocket->close();
+}
+
+void Widget::closeConnection()
+{
+   qDebug("close: close conn");
+   tcpSocket->close();
+}
+
+void Widget::error()
+{
+   QString mess = tcpSocket->errorString();
+   qDebug("error: %s", mess.toUtf8().constData());
+
+   tcpSocket->close();
+}
+
+void Widget::logout_Pressed()
+{
+    ui->idEdit->clear();
+    ui->pwEdit->clear();
+    ui->logoutButton->hide();
+    ui->graphView->hide();
+    ui->loginView->show();
 }
 
 void Widget::createPieChart()
