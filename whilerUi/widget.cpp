@@ -23,6 +23,8 @@
 #include <QString>
 #include <QStringList>
 
+#include <QPixmap>
+
 #include "piechart.h"
 
 QT_CHARTS_USE_NAMESPACE
@@ -32,9 +34,10 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    setWindowTitle("while(r);");
+    //setWindowTitle("while(r);");
 
-    ui->graphView->hide();
+    ui->graphView->show();//hide();
+    ui->loginView->hide();
 
     ui->logoutButton->hide();
 
@@ -65,7 +68,6 @@ Widget::Widget(QWidget *parent) :
     ui->lineChartLayout->addWidget(lineChartView);
 
     //ui->logoutLabel->setText(ui->dateTimeEdit->text());
-
 }
 
 Widget::~Widget()
@@ -114,15 +116,6 @@ void Widget::joinLabel_Pressed()
 
 void Widget::login_Pressed()
 {
-    QString strtmp;
-    strtmp = ui->idEdit->text();
-    if(strtmp != "")
-    {
-        ui->loginView->hide();
-        ui->graphView->show();
-        ui->logoutButton->show();
-    }
-
     QString addr = "172.30.1.56";
     QString port_str = "8004";  //LineEdit
 
@@ -132,7 +125,7 @@ void Widget::login_Pressed()
 
     this->connectToServer(addr, port);
 
-    QString q_str = "1" + ui->idEdit->text() + " " + ui->pwEdit->text();
+    QString q_str = "login " + ui->idEdit->text() + " " + ui->pwEdit->text();
 
     QByteArray utf8_str = q_str.toUtf8();
 
@@ -160,19 +153,35 @@ void Widget::receiveData()
    //ui->textEdit->setText(rcv_data);
    //qDebug("rcv: '%s'", rcv_data.toUtf8().constData());
 
-   QString condition = rcv_data.section(";", 0, 0);
-   QString result = rcv_data.section(";", 1, 1);
+   QString condition = rcv_data.section(" ", 0, 0);
+   QString result = rcv_data.section(" ", 1, 1);
+
+   QString q_str;
+   QByteArray utf8_str;
 
    if(condition == "whiler")
    {
        ui->loginView->hide();
        ui->graphView->show();
        ui->logoutButton->show();
+
+       q_str = "line" + " " + result;
+       utf8_str = q_str.toUtf8();
+
+       tcpSocket->write(utf8_str);
+   }
+   else if(condition == "bar")
+   {
+
+   }
+   else if(condition == "line")
+   {
+       qDebug("line: '%s'", rcv_data.toUtf8().constData());
    }
 
-   qDebug("%s", result.toUtf8().constData());
+   //qDebug("%s", result.toUtf8().constData());
 
-   tcpSocket->close();
+   //tcpSocket->close();
 }
 
 void Widget::closeConnection()
@@ -234,7 +243,7 @@ void Widget::createBarChart()
 {
     QBarSet *set0 = new QBarSet("EMG1");
     QBarSet *set1 = new QBarSet("EMG2");
-    QBarSet *set2 = new QBarSet("Finger");
+    QBarSet *set2 = new QBarSet("Gyro");
 
     *set0 << 1 << 2 << 3 << 4 << 5 << 6;
     *set1 << 5 << 0 << 0 << 4 << 0 << 7;
