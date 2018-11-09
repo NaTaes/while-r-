@@ -36,16 +36,19 @@ Widget::Widget(QWidget *parent) :
     ui->setupUi(this);
     //setWindowTitle("while(r);");
 
-    ui->graphView->show();//hide();
-    ui->loginView->hide();
+    ui->graphView->hide();
+    //ui->graphView->show();
+    //ui->loginView->hide();
 
     ui->logoutButton->hide();
 
     tcpSocket = new QTcpSocket(this);
 
+    lineEMG1Series = new QLineSeries();
+    lineEMG2Series = new QLineSeries();
+    lineGyroSeries = new QLineSeries();
+
     connect(ui->logoutIcon, SIGNAL(mouse_Pressed()), this, SLOT(mouse_Pressed()));
-    connect(ui->logoutIcon, SIGNAL(mouse_Left()), this, SLOT(mouse_Left()));
-    connect(ui->logoutIcon, SIGNAL(mouse_Enter()), this, SLOT(mouse_Enter()));
     connect(ui->loginButton, SIGNAL(clicked(bool)), this, SLOT(login_Pressed()));
     connect(ui->logoutButton, SIGNAL(clicked(bool)), this, SLOT(logout_Pressed()));
 
@@ -61,11 +64,11 @@ Widget::Widget(QWidget *parent) :
 
     createPieChart();
     createBarChart();
-    createLineChart();
+    //createLineChart();
 
     ui->pieChartLayout->addWidget(pieChartView);
     ui->barChartLayout->addWidget(barChartView);
-    ui->lineChartLayout->addWidget(lineChartView);
+    //ui->lineChartLayout->addWidget(lineChartView);
 
     //ui->logoutLabel->setText(ui->dateTimeEdit->text());
 }
@@ -77,19 +80,8 @@ Widget::~Widget()
 
 void Widget::mouse_Pressed()
 {
+    tcpSocket->close();
     qApp->exit();
-}
-
-void Widget::mouse_Enter()
-{
-    //ui->graphView->hide();
-    //ui->loginView->show();
-}
-
-void Widget::mouse_Left()
-{
-    //ui->loginView->hide();
-    //ui->graphView->show();
 }
 
 void Widget::joinLabel_Enter()
@@ -110,13 +102,13 @@ void Widget::joinLabel_Left()
 
 void Widget::joinLabel_Pressed()
 {
-    QString link = "http://172.30.1.56:8001";
+    QString link = "http://192.168.1.33:8001";
     QDesktopServices::openUrl(QUrl(link));
 }
 
 void Widget::login_Pressed()
 {
-    QString addr = "172.30.1.56";
+    QString addr = "192.168.1.33";
     QString port_str = "8004";  //LineEdit
 
     bool is_ok;
@@ -142,7 +134,7 @@ void Widget::connectToServer(const QString &host, quint16 port)
 
 void Widget::receiveData()
 {
-   qDebug("rcv: start");
+   //qDebug("rcv: start");
 
    QByteArray rcv_bytes = tcpSocket->readAll();
 
@@ -151,7 +143,7 @@ void Widget::receiveData()
    else rcv_data = QString::fromUtf8(rcv_bytes);
 
    //ui->textEdit->setText(rcv_data);
-   //qDebug("rcv: '%s'", rcv_data.toUtf8().constData());
+   qDebug("rcv: '%s'", rcv_data.toUtf8().constData());
 
    QString condition = rcv_data.section(" ", 0, 0);
    QString result = rcv_data.section(" ", 1, 1);
@@ -165,23 +157,87 @@ void Widget::receiveData()
        ui->graphView->show();
        ui->logoutButton->show();
 
-       q_str = "line" + " " + result;
+       q_str = "line " + result;
        utf8_str = q_str.toUtf8();
 
        tcpSocket->write(utf8_str);
    }
    else if(condition == "bar")
    {
+       QString EMG1 = rcv_data.section(" ", 1, 1);
+       QString EMG2 = rcv_data.section(" ", 2, 2);
+       QString Gyro = rcv_data.section(" ", 3, 3);
+       QString Day = rcv_data.section(" ", 4, 4);
+       QString End = rcv_data.section(" ", 5, 5);
+
+       qreal EMG1y = EMG1.toDouble();
+       qreal EMG2y = EMG2.toDouble();
+       qreal Gyroy = Gyro.toDouble();
+
 
    }
    else if(condition == "line")
    {
-       qDebug("line: '%s'", rcv_data.toUtf8().constData());
+       QString EMG1;
+       QString EMG2;
+       QString Gyro;
+       QString Day;
+       QString Month;
+       QString Date;
+       QString Year;
+       QString Time;
+       QString End;
+
+       qreal EMG1y;
+       qreal EMG2y;
+       qreal Gyroy;
+
+       for(int i=0; ; i+=14)
+       {
+           EMG1 = rcv_data.section(" ", i+1, i+1);
+           EMG2 = rcv_data.section(" ", i+2, i+2);
+           Gyro = rcv_data.section(" ", i+3, i+3);
+           Day = rcv_data.section(" ", i+4, i+4).section("", 1, 1);
+           Month = rcv_data.section(" ", i+5, i+5).section("", 1, 1);
+           Date = rcv_data.section(" ", i+6, i+6);
+           Year = rcv_data.section(" ", i+7, i+7).section("", 3, 4);
+           Time = rcv_data.section(" ", i+12, i+12).section("", 1, 13);
+           End = rcv_data.section(" ", i+13, i+13);
+/*
+           qDebug("EMG1: %s", EMG1.toUtf8().constData());
+           qDebug("EMG2: %s", EMG2.toUtf8().constData());
+           qDebug("Gyro: %s", Gyro.toUtf8().constData());
+           qDebug("Day: %s", Day.toUtf8().constData());
+           qDebug("Month: %s", Month.toUtf8().constData());
+           qDebug("Date: %s", Date.toUtf8().constData());
+           qDebug("Year: %s", Year.toUtf8().constData());
+           qDebug("Time: %s", Time.toUtf8().constData());
+           qDebug("End: %s", End.toUtf8().constData());
+*/
+           EMG1y = EMG1.toDouble();
+           EMG2y = EMG2.toDouble();
+           Gyroy = Gyro.toDouble();
+
+           lineEMG1Series->append(lineCount, EMG1y);
+           lineEMG2Series->append(lineCount, EMG2y);
+           lineGyroSeries->append(lineCount, Gyroy);
+
+           lineCount++;
+
+           lineCategories.append(Year + Month + Date + Day + Time);
+
+           if(End == "00")
+           {
+               break;
+           }
+           if(End == "11")
+           {
+               qDebug("End: %s", End.toUtf8().constData());
+               createLineChart();
+               break;
+           }
+       }
    }
-
-   //qDebug("%s", result.toUtf8().constData());
-
-   //tcpSocket->close();
 }
 
 void Widget::closeConnection()
@@ -205,6 +261,8 @@ void Widget::logout_Pressed()
     ui->logoutButton->hide();
     ui->graphView->hide();
     ui->loginView->show();
+
+    tcpSocket->close();
 }
 
 void Widget::createPieChart()
@@ -245,9 +303,17 @@ void Widget::createBarChart()
     QBarSet *set1 = new QBarSet("EMG2");
     QBarSet *set2 = new QBarSet("Gyro");
 
-    *set0 << 1 << 2 << 3 << 4 << 5 << 6;
+    //*set0 << 1 << 2 << 3 << 4 << 5 << 6;
+    set0->append(1);
+    set0->append(2);
+    set0->append(3);
+    set0->append(4);
+    set0->append(5);
+    set0->append(6);
+
     *set1 << 5 << 0 << 0 << 4 << 0 << 7;
     *set2 << 3 << 5 << 8 << 13 << 8 << 5;
+
 
     QBarSeries *series = new QBarSeries();
     series->append(set0);
@@ -275,6 +341,8 @@ void Widget::createBarChart()
 
 void Widget::createLineChart()
 {
+    lineCount = 0;
+/*
     QLineSeries *series = new QLineSeries();
 
     series->append(0, 6);
@@ -282,16 +350,41 @@ void Widget::createLineChart()
     series->append(3, 8);
     series->append(7, 4);
     series->append(10, 5);
+
     *series << QPointF(11, 1) << QPointF(13, 3) << QPointF(17, 6) << QPointF(18, 3) << QPointF(20, 2);
+
+
+
+    QStringList categories;
+    categories.append("Monday");
+    categories.append("Tuesday");
+    categories.append("Wednesday");
+    categories.append("Thursday");
+    categories.append("Friday");
+    categories.append("Saturday");
+    categories.append("Sunday");
+
+    //categories << "Monday" << "Tuesday" << "Wednesday" << "Thursday" << "Friday" << "Saturday" << "Sunday";
+*/
+    QBarCategoryAxis *axis = new QBarCategoryAxis();
+    axis->append(lineCategories);
 
     QChart *chart = new QChart();
     chart->legend()->hide();
-    chart->addSeries(series);
+    chart->addSeries(lineEMG1Series);
+    chart->addSeries(lineEMG2Series);
+    chart->addSeries(lineGyroSeries);
     chart->createDefaultAxes();
+    chart->setAxisX(axis, lineEMG1Series);
+    chart->setAxisX(axis, lineEMG2Series);
+    chart->setAxisX(axis, lineGyroSeries);
     //chart->setTitle("Simple line chart example");
 
     lineChartView = new QChartView(chart);
+
     lineChartView->setRenderHint(QPainter::Antialiasing);
+
+    ui->lineChartLayout->addWidget(lineChartView);
 }
 
 void Widget::refresh_Pressed()

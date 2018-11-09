@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QtCharts/QChartGlobal>
+#include <QtCharts/QLineSeries>
 
 QT_CHARTS_BEGIN_NAMESPACE
 class QChartView;
@@ -11,6 +12,7 @@ QT_CHARTS_END_NAMESPACE
 QT_CHARTS_USE_NAMESPACE
 
 class QTcpSocket;
+//class QLineSeries;
 
 namespace Ui {
 class Widget;
@@ -33,11 +35,16 @@ private:
     QChartView *lineChartView;
     Ui::Widget *ui;
     QTcpSocket *tcpSocket;
+    QLineSeries *lineEMG1Series;
+    QLineSeries *lineEMG2Series;
+    QLineSeries *lineGyroSeries;
+    int lineCount = 0;
+    QStringList lineCategories;
+
+
 
 private slots:
     void mouse_Pressed();
-    void mouse_Enter();
-    void mouse_Left();
     void refresh_Pressed();
     void login_Pressed();
     void logout_Pressed();
