@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QtCharts/QChartGlobal>
 #include <QtCharts/QLineSeries>
+#include <QtCharts/QBarSet>
 
 QT_CHARTS_BEGIN_NAMESPACE
 class QChartView;
@@ -40,6 +41,14 @@ private:
     QLineSeries *lineGyroSeries;
     int lineCount = 0;
     QStringList lineCategories;
+    QString nickName;
+    QBarSet *set0;
+    QBarSet *set1;
+    QBarSet *set2;
+    //QStringList categories;
+    int barWeek = 0;
+    bool weekCheck = true;
+    QString week[7] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
 
 

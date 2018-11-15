@@ -502,6 +502,9 @@
       </item>
       <item>
        <widget class="QScrollArea" name="graphView">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="widgetResizable">
          <bool>true</bool>
         </property>
